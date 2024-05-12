@@ -1,7 +1,13 @@
 import altair as alt
-import numpy as np
-import pandas as pd
 import streamlit as st
+import requests
+import pandas as pd
+import numpy as np
+import json
+import matplotlib.pyplot as plt
+from datetime import timedelta, datetime
+from matplotlib.ticker import StrMethodFormatter
+
 
 """
 # Welcome to Streamlit!
@@ -13,8 +19,6 @@ forums](https://discuss.streamlit.io).
 In the meantime, below is an example of what you can do with just a few lines of code:
 """
 
-st.divider()
-st.divider()
 st.divider()
 
 num_points = st.slider("Number of points in spiral", 1, 10000, 1100)
