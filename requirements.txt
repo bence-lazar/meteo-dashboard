@@ -1,3 +1,7 @@
 altair
 pandas
 streamlit
+requests
+json
+matplotlib
+datetime
