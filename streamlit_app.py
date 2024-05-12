@@ -60,6 +60,11 @@ df = get_meteo_data(url)
 hourly = process_hourly_data(df)
 daily = process_daily_data(df)
 
+# sidebar:
+
+location = [{'latitude':47.60, 'longitude':19.36}]
+with st.sidebar:
+    st.map(location)
 
 def plot_temp_data(hourly, daily):
     # create figure object and set canvas size:
