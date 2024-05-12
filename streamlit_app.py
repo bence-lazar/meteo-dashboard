@@ -173,7 +173,7 @@ def plot_temp_data(hourly, daily):
     ### legend box position:
     fig.legend(['Temperature', 'Daylight'], bbox_to_anchor =(1.04,0.08), loc='lower right')
 
-    st.pyplot()
+    st.pyplot(fig)
 
 # Plot the temp data:
 plot_temp_data(hourly, daily)
