@@ -10,14 +10,54 @@ from matplotlib.ticker import StrMethodFormatter
 
 
 """
-# Welcome to Streamlit!
-
-Edit `/streamlit_app.py` to customize this app to your heart's desire :heart:.
-If you have any questions, checkout our [documentation](https://docs.streamlit.io) and [community
-forums](https://discuss.streamlit.io).
-
-In the meantime, below is an example of what you can do with just a few lines of code:
+# Weather Dashboard
+Data from OpenMeteo API 
 """
+
+st.divider()
+
+url = 'https://api.open-meteo.com/v1/forecast?latitude=47.60&longitude=19.36&hourly=temperature_2m,relativehumidity_2m,dewpoint_2m,apparent_temperature,precipitation_probability,precipitation,rain,showers,snowfall,snow_depth,weathercode,cloudcover,cloudcover_low,cloudcover_mid,cloudcover_high,visibility,windspeed_10m,winddirection_10m,windgusts_10m,freezinglevel_height&daily=sunrise,sunset&forecast_days=3&timezone=Europe%2FBerlin'
+
+def get_meteo_data(url):
+    response = requests.get(url)
+    if response.status_code == 200: # 200 means success
+        data = response.json() # Get the response data as a JSON object
+    else:
+        print('Error getting data: ', response.status_code)
+        
+    df = pd.read_json(json.dumps(data))
+    return df
+
+def process_daily_data(df):
+    # extract daily data without NA-s:
+    daily_wo_nan = pd.DataFrame(df['daily'].dropna(how='any'))
+    # reorder time, sunrise and sunset data to columns:
+    daily = pd.DataFrame()
+    for line in daily_wo_nan.index:
+        daily[line] = daily_wo_nan['daily'][line]
+    # transform string to datetime type:
+    daily['sunrise'] = pd.to_datetime(daily['sunrise'])
+    daily['sunset'] = pd.to_datetime(daily['sunset'])
+    
+    return daily
+
+def process_hourly_data(df):
+    # extract hourly data without NA-s:
+    hourly_wo_nan = pd.DataFrame(df['hourly'].dropna(how='any'))
+    # reorder lines into data frame columns:
+    hourly = pd.DataFrame()
+    for line in hourly_wo_nan.index:
+        hourly[line] = hourly_wo_nan['hourly'][line]
+    # transform string to datetime type:
+    hourly['time'] = pd.to_datetime(hourly['time'])
+    
+    return hourly
+
+st.write('Getting the data...')
+df = get_meteo_data(url)
+hourly = process_hourly_data(df)
+daily = process_daily_data(df)
+st.write('... done!')
 
 st.divider()
 
