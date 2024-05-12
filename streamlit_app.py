@@ -6,7 +6,7 @@ import numpy as np
 import json
 import matplotlib.pyplot as plt
 from datetime import timedelta, datetime
-from matplotlib.ticker import StrMethodFormatter
+#from matplotlib.ticker import StrMethodFormatter
 
 
 """
