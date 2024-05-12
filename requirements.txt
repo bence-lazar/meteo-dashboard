@@ -3,5 +3,6 @@ pandas
 streamlit
 requests
 json
-matplotlib
+matplotlib.pyplot
+matplotlib.ticker
 datetime
