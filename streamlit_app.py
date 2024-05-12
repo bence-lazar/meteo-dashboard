@@ -60,7 +60,124 @@ df = get_meteo_data(url)
 hourly = process_hourly_data(df)
 daily = process_daily_data(df)
 
-# 
+
+def plot_temp_data(hourly, daily):
+    # create figure object and set canvas size:
+    fig, ax = plt.subplots(1,1,figsize=(15,3))
+
+    ### plot temperature data:
+    ax.plot(hourly['time'], hourly['temperature_2m'], color='#F78221', label = 'Temperature', zorder=3)
+
+    # set axis labels:
+    ax.set_xlabel('Time')
+    ax.set_ylabel('Temperature (°C)')
+    # set ylim and add more space above and below the plotted data (10% of the ylim max value):
+    y_min = ax.get_ylim()[0]-(ax.get_ylim()[1]*0.10)
+    y_max = ax.get_ylim()[1]+(ax.get_ylim()[1]*0.10)
+    ax.set_ylim(y_min,y_max)
+
+    ### Second y-axis on the right, copy of left side:
+    ax2 = ax.twinx()
+    ax2.set_ylim(ax.get_ylim())
+    ax2.set_ylabel('Temperature (°C)')
+
+    # Format y-axis to show 0 decimals
+    ax.yaxis.set_major_formatter(StrMethodFormatter('{x:.0f}'))
+    ax2.yaxis.set_major_formatter(StrMethodFormatter('{x:.0f}'))
+
+    ### calculate daily min and max values and store the time they measured:
+    min_max_temps = []
+    min_max_times = []
+    for day in [[0,25],[25,49],[49,72]]:
+        min=hourly['temperature_2m'][day[0]:day[1]].min()
+        min_time = hourly['time'][hourly['temperature_2m'][day[0]:day[1]].idxmin()]
+        max=hourly['temperature_2m'][day[0]:day[1]].max()
+        max_time = hourly['time'][hourly['temperature_2m'][day[0]:day[1]].idxmax()]
+        min_max_temps.append(min)
+        min_max_temps.append(max)
+        min_max_times.append(min_time)
+        min_max_times.append(max_time)
+
+    # write min and max temps on the plot:
+    for i in range(6):
+        ax.text(x=min_max_times[i], y=min_max_temps[i], s=min_max_temps[i], color='black', alpha=0.7, ha='center', va='top', fontsize=12)
+
+
+    ### create and plot small x axis ticks for every hour and bigger x axis ticks for every 6 hours with labels:
+    # set start and end time points for generating tick positions (based on 'time' variable):
+    start = hourly['time'].iloc[0]
+    # here + 1 hour (last time point is 23:00 for every day, but we need 24:00):
+    end = hourly['time'].iloc[-1] + timedelta(hours=1)
+
+    # create x tick positions as a datetime object:
+    hourly_ticks = pd.date_range(start=start, end=end, freq='h', normalize=True)
+    six_hour_ticks = pd.date_range(start=start, end=end, freq='3h', normalize=True)
+
+    # create labels for every 6 hours:
+    xtick_labels = [x.strftime('%H') if x in hourly_ticks else '' for x in six_hour_ticks]
+
+    # plot x ticks and labels:
+    ax.set_xticks(hourly_ticks, minor=True)
+    ax.set_xticks(six_hour_ticks)
+    ax.set_xticklabels(xtick_labels, fontsize=10)
+
+    ### vertical lines between days based on the 'time' variable (start and end are set above):
+    # generate vertical line positions as a datetime object:
+    daybreak_lines = pd.date_range(start=start, end=end, freq='D', normalize=True)
+
+    # plot vertical lines:
+    for date in daybreak_lines:
+        plt.axvline(x=date, color='grey', linestyle='--', zorder=2)
+
+    ### color filled area indicating the time between sunrise and sunset: 
+    for i in range(3):
+        ax.axvspan(daily['sunrise'][i],daily['sunset'][i],color='#FFEF50',alpha=0.5, label='Daylight', zorder=1)
+
+    ### horizontal grid lines:
+    ax.grid(axis='y',alpha=0.3,linestyle='--')
+
+    ### date and day sign above the plot:
+    # create list with signs for the days to show above the plot:
+    day_sign = []
+    weekday_log = []
+    weekdays = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
+    for i in [0,24,48]:
+        year = hourly['time'].dt.year[i]
+        month = hourly['time'].dt.month[i]
+        day = hourly['time'].dt.day[i]
+        weekday = weekdays[hourly['time'][i].weekday()]
+        day_sign.append(str(weekday)+' - '+str(year)+'.'+str(month)+'.'+str(day))
+        weekday_log.append(weekday)
+        
+    # create a list with day sign colors - orange for weekend, black for weekdays:
+    weekday_color = []
+    for weekday in weekday_log:
+        if str(weekday) in ['Saturday','Sunday']:
+            weekday_color.append('#F78221')
+        else:
+            weekday_color.append('black')
+
+    # define x positions for signs based on sunrise-sunset:
+    sign_x_pos=[]
+    for i in range(3):
+        diff = (daily['sunset'][i]-daily['sunrise'][i])/2
+        pos = daily['sunrise'][i] + diff
+        sign_x_pos.append(pos)
+
+    # define y position for signs based on the actual ymax of the plot:
+    sign_y_pos=ax.get_ylim()[1]+(ax.get_ylim()[1])*0.05
+
+    # plot day and date sign with colors above the graph:
+    for i in range(3):
+        ax.text(x=sign_x_pos[i], y=sign_y_pos, s=day_sign[i], color=weekday_color[i], ha='center', va='center')
+
+    ### legend box position:
+    fig.legend(['Temperature', 'Daylight'], bbox_to_anchor =(1.04,0.08), loc='lower right')
+
+    plt.show()
+
+# Plot the temp data:
+plot_temp_data(hourly, daily)
 
 st.divider()
 
