@@ -11,7 +11,7 @@ from matplotlib.ticker import StrMethodFormatter
 
 """
 # Weather Dashboard
-Data from OpenMeteo API 
+Data from [Open-Meteo Weather API](https://open-meteo.com/) 
 """
 current_date = str(pd.to_datetime(datetime.today().date()))[:10]
 st.write(current_date)
