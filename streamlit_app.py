@@ -11,8 +11,9 @@ from matplotlib.ticker import StrMethodFormatter
 
 """
 # Weather Dashboard
-Data from [Open-Meteo Weather API](https://open-meteo.com/) 
+Data from [Open-Meteo Weather API](https://open-meteo.com/)
 """
+
 current_date = str(pd.to_datetime(datetime.today().date()))[:10]
 st.write(current_date)
 
@@ -55,16 +56,20 @@ def process_hourly_data(df):
     
     return hourly
 
-# Getting and processing the data:
+#### Getting and processing the data ####
 df = get_meteo_data(url)
 hourly = process_hourly_data(df)
 daily = process_daily_data(df)
 
-# sidebar:
+#### sidebar ####
 
+# location map:
 location = [{'latitude':47.60, 'longitude':19.36}]
 with st.sidebar:
     st.map(location)
+
+
+#### main area ####
 
 def plot_temp_data(hourly, daily):
     # create figure object and set canvas size:
@@ -183,7 +188,27 @@ def plot_temp_data(hourly, daily):
 # Plot the temp data:
 plot_temp_data(hourly, daily)
 
+# Plot with streamlit:
+
+
 st.divider()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#### code from streamlit example
 
 num_points = st.slider("Number of points in spiral", 1, 10000, 1100)
 num_turns = st.slider("Number of turns in spiral", 1, 300, 31)
