@@ -13,6 +13,8 @@ from matplotlib.ticker import StrMethodFormatter
 # Weather Dashboard
 Data from OpenMeteo API 
 """
+current_date = str(pd.to_datetime(datetime.today().date()))[:10]
+st.write(current_date)
 
 st.divider()
 
@@ -53,11 +55,12 @@ def process_hourly_data(df):
     
     return hourly
 
-st.write('Getting the data...')
+# Getting and processing the data:
 df = get_meteo_data(url)
 hourly = process_hourly_data(df)
 daily = process_daily_data(df)
-st.write('... done!')
+
+# 
 
 st.divider()
 
