@@ -102,7 +102,6 @@ def plot_temp_data(hourly, daily):
     for i in range(6):
         ax.text(x=min_max_times[i], y=min_max_temps[i], s=min_max_temps[i], color='black', alpha=0.7, ha='center', va='top', fontsize=12)
 
-
     ### create and plot small x axis ticks for every hour and bigger x axis ticks for every 6 hours with labels:
     # set start and end time points for generating tick positions (based on 'time' variable):
     start = hourly['time'].iloc[0]
@@ -174,7 +173,7 @@ def plot_temp_data(hourly, daily):
     ### legend box position:
     fig.legend(['Temperature', 'Daylight'], bbox_to_anchor =(1.04,0.08), loc='lower right')
 
-    plt.show()
+    st.pyplot()
 
 # Plot the temp data:
 plot_temp_data(hourly, daily)
