@@ -189,7 +189,79 @@ def plot_temp_data(hourly, daily):
 plot_temp_data(hourly, daily)
 
 # Plot with streamlit:
+def plot_temp_data_altair(hourly, daily):
+    # calculate daily min and max values and store the time they measured:
+    min_max_temps = []
+    min_max_times = []
+    for day in [[0, 25], [25, 49], [49, 72]]:
+        min_temp = hourly['temperature_2m'][day[0]:day[1]].min()
+        min_time = hourly['time'][hourly['temperature_2m'][day[0]:day[1]].idxmin()]
+        max_temp = hourly['temperature_2m'][day[0]:day[1]].max()
+        max_time = hourly['time'][hourly['temperature_2m'][day[0]:day[1]].idxmax()]
+        min_max_temps.extend([min_temp, max_temp])
+        min_max_times.extend([min_time, max_time])
 
+    min_max_df = pd.DataFrame({'time': min_max_times, 'temperature': min_max_temps})
+
+    # create small x axis ticks for every hour and bigger x axis ticks for every 6 hours with labels:
+    hourly_ticks = pd.date_range(start=hourly['time'].iloc[0], end=hourly['time'].iloc[-1] + pd.Timedelta(hours=1), freq='h', normalize=True)
+    six_hour_ticks = pd.date_range(start=hourly['time'].iloc[0], end=hourly['time'].iloc[-1] + pd.Timedelta(hours=1), freq='6h', normalize=True)
+    xtick_labels = [x.strftime('%H') if x in hourly_ticks else '' for x in six_hour_ticks]
+
+    # plot vertical lines between days
+    daybreak_lines = pd.date_range(start=hourly['time'].iloc[0], end=hourly['time'].iloc[-1] + pd.Timedelta(hours=1), freq='D', normalize=True)
+
+    # color filled area indicating the time between sunrise and sunset
+    daylights = [{'start': sunrise, 'end': sunset} for sunrise, sunset in zip(daily['sunrise'], daily['sunset'])]
+
+    min_max_chart = alt.Chart(min_max_df).mark_text(align='center', baseline='bottom', fontSize=12).encode(
+        x='time:T',
+        y='temperature:Q',
+        text='temperature:Q',
+        color=alt.value('black')
+    )
+
+    hourly_ticks_chart = alt.Chart(hourly_ticks.reset_index()).mark_tick().encode(
+        x=alt.X('index:T', axis=alt.Axis(values=list(six_hour_ticks), format='%H', tickCount=len(six_hour_ticks), title='Time')),
+        color=alt.value('black')
+    )
+
+    daybreak_lines_chart = alt.Chart(daybreak_lines.reset_index()).mark_rule(color='grey', strokeDash=[3, 3]).encode(
+        x='index:T'
+    )
+
+    daylights_chart = alt.Chart(pd.DataFrame(daylights)).mark_rect(color='#FFEF50', opacity=0.5).encode(
+        x='start:T',
+        x2='end:T'
+    )
+
+    sign_x_pos = [(start + (end - start) / 2) for start, end in zip(daily['sunrise'], daily['sunset'])]
+    sign_y_pos = min_max_df['temperature'].max() + (min_max_df['temperature'].max() * 0.05)
+
+    day_sign_df = pd.DataFrame({
+        'time': sign_x_pos,
+        'sign': [f"{weekday} - {time.year}.{time.month}.{time.day}" for weekday, time in zip(hourly['time'].dt.day_name(), daily['time'])]
+    })
+
+    day_sign_chart = alt.Chart(day_sign_df).mark_text(align='center', baseline='middle').encode(
+        x='time:T',
+        y=alt.value(sign_y_pos),
+        text='sign:N',
+        color=alt.condition(alt.datum.sign.str.contains('Saturday|Sunday'), alt.value('#F78221'), alt.value('black'))
+    )
+
+    combined_chart = min_max_chart + hourly_ticks_chart + daybreak_lines_chart + daylights_chart + day_sign_chart
+
+    return combined_chart.properties(
+        width=700,
+        height=300
+    ).resolve_scale(
+        y='independent'
+    ).configure_axis(
+        labelFontSize=10
+    )
+
+st.altair_chart(plot_temp_data_altair(hourly, daily))
 
 st.divider()
 
