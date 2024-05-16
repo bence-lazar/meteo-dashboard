@@ -1,6 +1,6 @@
-altair
-pandas
+plotly
 streamlit
 requests
-matplotlib
+pandas
 datetime
+pytz
