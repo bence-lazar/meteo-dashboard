@@ -1,6 +1,4 @@
-# Welcome to Streamlit!
+# Dashboard for visualizing 3-day weather forcast as meteograms
 
-Edit `/streamlit_app.py` to customize this app to your heart's desire. :heart:
+The app uses data from Open Meteo (https://open-meteo.com/en/docs) Weather Forecast API and Geocoding API.
 
-If you have any questions, checkout our [documentation](https://docs.streamlit.io) and [community
-forums](https://discuss.streamlit.io).
