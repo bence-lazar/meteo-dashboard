@@ -7,6 +7,14 @@ import json
 from datetime import timedelta, datetime
 from pytz import timezone
 
+# Page configuration
+st.set_page_config(
+    page_title="Meteo Dashboard",
+    page_icon="🌤️",
+    layout="centered",
+    initial_sidebar_state="expanded"
+    }
+)
 
 ######## Sidebar ########
 
