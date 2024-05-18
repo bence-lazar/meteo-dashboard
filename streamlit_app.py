@@ -187,8 +187,8 @@ fig.update_layout(
 )
 
 # Disable zoom for both axes
-fig.update_xaxes(fixedrange=False)
-fig.update_yaxes(fixedrange=False)
+fig.update_xaxes(fixedrange=True)
+fig.update_yaxes(fixedrange=True)
 
 # Calculate daily min and max values and store the time they were measured
 min_max_temps = []
