@@ -162,6 +162,7 @@ local_time = get_local_time(local_timezone)
 
 # Create fig and plot data
 fig = go.Figure()
+config = {'scrollZoom': False}
 
 fig.add_trace(go.Scatter(x=hourly['time'], y=hourly['temperature_2m'], mode='lines', name='Temperature', line=dict(color='#ffa929')))
 fig.add_trace(go.Scatter(x=hourly['time'], y=hourly['apparent_temperature'], mode='lines', name='Apparent Temperature', line=dict(color='#ed601f')))
