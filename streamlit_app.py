@@ -309,6 +309,10 @@ fig.update_layout(
     )
 )
 
+# Disable zoom for both axes
+fig.update_xaxes(fixedrange=True)
+fig.update_yaxes(fixedrange=True)
+
 # Current local time for the selected location with a vertical line
 fig.add_shape(type="line", x0=local_time, y0=-6, x1=local_time, y1=hourly['windgusts_10m'].max()+5, line=dict(color="black", width=1, dash="dot"))
 
@@ -412,6 +416,10 @@ fig.update_layout(
         t=0
     )
 )
+
+# Disable zoom for both axes
+fig.update_xaxes(fixedrange=True)
+fig.update_yaxes(fixedrange=True)
 
 # Set y max value based on the data
 if hourly['rain'].max() > hourly['showers'].max():
