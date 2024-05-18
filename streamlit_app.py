@@ -162,7 +162,6 @@ local_time = get_local_time(local_timezone)
 
 # Create fig and plot data
 fig = go.Figure()
-config = {'scrollZoom': False}
 
 fig.add_trace(go.Scatter(x=hourly['time'], y=hourly['temperature_2m'], mode='lines', name='Temperature', line=dict(color='#ffa929')))
 fig.add_trace(go.Scatter(x=hourly['time'], y=hourly['apparent_temperature'], mode='lines', name='Apparent Temperature', line=dict(color='#ed601f')))
@@ -186,6 +185,10 @@ fig.update_layout(
     
     )
 )
+
+# Disable zoom for both axes
+fig.update_xaxes(fixedrange=False)
+fig.update_yaxes(fixedrange=False)
 
 # Calculate daily min and max values and store the time they were measured
 min_max_temps = []
