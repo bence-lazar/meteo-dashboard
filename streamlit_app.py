@@ -22,7 +22,8 @@ st.set_page_config(
 
 # Input widget:
 with st.sidebar:
-    location_input = st.text_input("Search for cities:", "Budapest")
+    st.write('### Weather Forecast Dashboard')
+    location_input = st.text_input("Search for a city:", "Budapest")
 
 # Open Meteo Geocoding API call:
 url = "https://geocoding-api.open-meteo.com/v1/search"
