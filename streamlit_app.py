@@ -77,7 +77,7 @@ st.dataframe(city_info_table,
 
 # Show date and time of data collection:
 current_date = str(pd.to_datetime(datetime.today()))[:16]
-st.write(f'Data collected: {current_date}')
+st.write(f'Data collected: {current_date} UTC')
 
 
 #### Funcions ####
