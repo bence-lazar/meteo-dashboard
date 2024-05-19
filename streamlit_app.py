@@ -58,7 +58,7 @@ for location in searched_location[['name', 'country', 'timezone', 'latitude','lo
 # Selectbox widget
 with st.sidebar:
     option = st.selectbox(
-        "Chose the from the list below:",
+        "Choose from the list below:",
         (options),
         index=None,
         placeholder="Select city...",
