@@ -7,6 +7,7 @@ import json
 from datetime import timedelta, datetime
 from pytz import timezone
 
+
 # Page configuration
 st.set_page_config(
     page_title="Meteo Dashboard",
@@ -14,6 +15,7 @@ st.set_page_config(
     layout="centered",
     initial_sidebar_state="expanded"
 )
+
 
 ######## Sidebar ########
 
@@ -29,7 +31,7 @@ with st.sidebar:
 url = "https://geocoding-api.open-meteo.com/v1/search"
 params = {
     "name": location_input,
-    "count": 1
+    "count": 10
 }
 
 response = requests.get(url, params=params)
@@ -39,23 +41,47 @@ if response.status_code == 200: # 200 means success
         searched_location = pd.json_normalize(response_data['results'])
     except (NameError, KeyError):
         with st.sidebar:
-            st.warning('City not found! Please choose another.')
+            st.warning('The city cannot be found. Please choose another one.')
+            st.stop()
 else:
     with st.sidebar:
         st.write('Error getting data: ', response.status_code)
 
-### Set params for choosen location:
-city = searched_location.at[0, 'name']
-latitude = searched_location.at[0, 'latitude']
-longitude = searched_location.at[0, 'longitude']
-coordinates = [{'latitude':latitude, 'longitude':longitude}]
-elevation = searched_location.at[0, 'elevation']
-country = searched_location.at[0, 'country']
-local_timezone = searched_location.at[0, 'timezone']
+# Create options for the selectbox widget from the geocoding API data
+options = []
+for location in searched_location[['name', 'country', 'timezone', 'latitude','longitude']].values:
+    temp = list(map(str, location))
+    delim = ', '
+    option = delim.join(temp)
+    options.append(option)
 
-### Show map in sidebar:
-with st.sidebar:    
-    st.map(coordinates, zoom=10, size=300)
+# Selectbox widget
+with st.sidebar:
+    option = st.selectbox(
+        "Chose the from the list below:",
+        (options),
+        index=None,
+        placeholder="Select city...",
+    )
+    st.write('''You selected:\n\n''', option)
+
+# If a city is selected from the options create city info variables and show map
+if option is not None:
+    ### Set params for choosen location:
+    city = option.split(',')[0]
+    country = option.split(',')[1][1:]
+    local_timezone = option.split(',')[2][1:]
+    latitude = float(option.split(',')[3][1:])
+    longitude = float(option.split(',')[4][1:])
+    coordinates = [{'latitude':latitude, 'longitude':longitude}] 
+
+    ### Show map in sidebar:
+    with st.sidebar:    
+        st.map(coordinates, zoom=10, size=300)
+else:
+    with st.sidebar:    
+        st.write('')
+
 
 
 
@@ -70,8 +96,13 @@ with st.sidebar:
 Data from [Open-Meteo API](https://open-meteo.com/)
 """
 
-# Create info table:
-city_info_table = pd.DataFrame({'City info':['city','latitude','longitude','elevation','country','timezone'], ' ':[city,latitude,longitude,elevation,country,local_timezone]})
+# If the 'city' variable is already defined create city info table, if not: warning and stop code
+try:
+    # Create info table:
+    city_info_table = pd.DataFrame({'City info':['city','latitude','longitude','country','timezone'], ' ':[city,latitude,longitude,country,local_timezone]})
+except NameError:
+    st.warning('Please select a city from the list at the sidebar.')
+    st.stop()
 
 # Set params for info table:
 st.dataframe(city_info_table, 
